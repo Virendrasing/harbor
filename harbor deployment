@@ -1,0 +1,88 @@
+
+HARBOR INSTALLATION ON ON PREMISES VM WITH DOCKERISE
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+root@localhost:~# apt-get install docker-ce docker-ce-cli containerd.io
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+root@localhost:~# wget https://github.com/goharbor/harbor/releases/download/v2.4.1/harbor-offline-installer-v2.4.1.tgz
+tar -xvzf harbor-offline-installer-v2.4.1.tgz
+cd harbor
+vi harbor.yaml
+edit 
+hostname: ideastoimpacts.com
+add path of private.key and server.cert
+harbor_admin_password: i2i@harbor123
+
+./install.sh
+
+hitt domain name
+
+PUSH DOCKER IMAGES TO HARBOR REPOSITORY
+
+docker tag DOCKER-IMAGES.NAME farmerappeks.ideastoimpacts.com/redmine/REPOSITORY(TAGNAME)
+
+EXAMPLE- docker tag quay.io/keycloak/keycloak farmerappeks.ideastoimpacts.com/redmine/quay.io/keycloak/keycloak
+
+docker images
+
+docker login repostory name
+
+EXAMPLE- docker login farmerappeks.ideastoimpacts.com
+
+username- admin
+pass- Harbor1234
+
+docker push farmerappeks.ideastoimpacts.com/redmine/REPOSITORY[IMAGE NAME]
+
+EXAMPLE- docker push farmerappeks.ideastoimpacts.com/redmine/quay.io/keycloak/keycloak
+
+
+PULL IMAGES TO ANOTHER VM 
+
+INSTALL DOCKER AND DOCKER COMPOSE ON VM 
+FIRSTELLY CREATE FOLDER ON VM 
+
+sudo mkdir -p /etc/docker/certs.d/HARBOR.URL/
+EXAMPLE- sudo mkdir -p /etc/docker/certs.d/farmerappeks.ideastoimpacts.com/
+
+COPY SERVER.CERT TO FOLLOWING PATH
+
+cp server.crt /etc/docker/certs.d/farmerappeks.ideastoimpacts.com/
+
+Restart docker 
+sudo systemctl restart docker
+ 
+CHECK DOCKER STATUS
+systemctl status docker
+
+NOW PULL IMAGES WITH FOLLOWING PULL COMMAND
+ docker pull farmerappeks.ideastoimpacts.com/redmine/quay.io/keycloak/keycloak:latest
+
+
+USER-
+privaterepo.ideastoimpacts.com
+
+USERNAME- yashwant@i2i
+PASSWORD- i2i@Yashwant123
+
+
+FOR PUSH DOCKER IMAGES FROM ANOTHER SERVER TO HARBPOR REPOSITORY
+
+vi /etc/docker/daemon.json
+{
+        "insecure-registries": ["privaterepo.ideastoimpacts.com"]
+}
+
+
+systemctl restart docker
+systemctl status docker
+
+docker login privaterepo.ideastoimpacts.com
+userename 
+pass
+
+docker push privaterepo.ideastoimpacts.com/redmine/kong
+
+ 
